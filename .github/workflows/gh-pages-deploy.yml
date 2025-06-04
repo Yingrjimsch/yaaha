@@ -6,7 +6,7 @@ on:
       tailwind_install_method:
         description: 'Install Tailwind via'
         required: false
-        default: 'npm'
+        default: 'binary'
         type: choice
         options:
           - binary
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TAILWIND_INSTALL_METHOD: ${{ github.event.inputs.tailwind_install_method || 'npm' }}
+      TAILWIND_INSTALL_METHOD: ${{ github.event.inputs.tailwind_install_method || 'binary' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -67,6 +67,7 @@ jobs:
         run: |
           wget -q -O ci-tools/tailwindcss https://github.com/tailwindlabs/tailwindcss/releases/download/v${{ env.TAILWIND_VERSION }}/tailwindcss-linux-x64
           chmod +x ci-tools/tailwindcss
+          npm i -D daisyui@${{ env.DAISYUI_VERSION }}
 
       - name: Download and install Trunk binary
         run: |
