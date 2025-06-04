@@ -137,14 +137,14 @@ pub fn Navbar() -> impl IntoView {
                 // <a class="text-xl">Yaaha</a>
                 // </navbar>
                 <div>
-                    <Router>
+                    <Router base="/yaaha">
                         <main>
                             // <Routes/> both defines our routes and shows them on the page
                             <Routes fallback=|| "Not found.">
                                 // our root route: the contact list is always shown
                                 <Route path=path!("") view=ContactList />
-                                <Route path=path!("/c/:id") view=Contact />
-                                <Route path=path!("/settings") view=Settings />
+                                <Route path=path!("c/:id") view=Contact />
+                                <Route path=path!("settings") view=Settings />
                             // a fallback if the /:id segment is missing from the URL
                             </Routes>
                         </main>
