@@ -6,7 +6,7 @@ on:
       tailwind_install_method:
         description: 'Install Tailwind via'
         required: false
-        default: 'binary'
+        default: 'npm'
         type: choice
         options:
           - binary
