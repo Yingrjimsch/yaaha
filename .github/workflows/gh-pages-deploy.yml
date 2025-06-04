@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TAILWIND_INSTALL_METHOD: ${{ github.event.inputs.tailwind_install_method || 'binary' }}
+      TAILWIND_INSTALL_METHOD: ${{ github.event.inputs.tailwind_install_method || 'npm' }}
 
     steps:
       - uses: actions/checkout@v4
