@@ -137,7 +137,7 @@ pub fn Navbar() -> impl IntoView {
                 // <a class="text-xl">Yaaha</a>
                 // </navbar>
                 <div>
-                    <Router base="/yaaha">
+                    <Router base="">
                         <main>
                             // <Routes/> both defines our routes and shows them on the page
                             <Routes fallback=|| "Not found.">
@@ -154,7 +154,7 @@ pub fn Navbar() -> impl IntoView {
             </div>
             <div class="drawer-side">
                 <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-                <ul class="p-4 w-80 min-h-full menu bg-base-200 text-base-content">
+                <ul class="p-4 w-80 min-h-full menu bg-base-300 text-base-content">
                     <li>
                         <label for="my-drawer" class="lg:hidden btn btn-primary drawer-button">
                             <svg
@@ -235,21 +235,21 @@ fn ContactList() -> impl IntoView {
     // loads the contact list data once; doesn't reload when nested routes change
     view! {
         <div class="flex flex-col h-screen bg-base-200">
-            <div class="flex justify-between items-center p-4 bg-base-300">
+            <div class="flex justify-between items-center p-4 bg-base-200">
                 <div>
-                    <label for="my-drawer" class="lg:hidden btn btn-primary drawer-button">
+                    <label for="my-drawer" class="lg:hidden drawer-button">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="w-6 h-6"
                             fill="none"
                             viewBox="0 0 24 24"
+                            stroke-width="1.5"
                             stroke="currentColor"
+                            class="size-6"
                         >
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
+                                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
                             />
                         </svg>
 
@@ -321,15 +321,17 @@ fn ContactList() -> impl IntoView {
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
                             viewBox="0 0 24 24"
-                            stroke-linejoin="round"
-                            stroke-linecap="round"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            class="size-6"
                         >
                             <path
-                                stroke="currentColor"
-                                stroke-width="2"
-                                d="M22 2 11 13M22 2l-7 20-4-9M22 2 2 9l9 4"
-                            ></path>
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                            />
                         </svg>
+
                     </button>
 
                 // <button class="btn btn-primary" on:click=on_click>
