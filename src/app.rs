@@ -11,6 +11,7 @@ use leptos_router::*;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use web_sys::console;
+use web_sys::window;
 // #[wasm_bindgen]
 // extern "C" {
 //     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
@@ -112,9 +113,16 @@ pub fn App() -> impl IntoView {
 
 #[component]
 pub fn Navbar() -> impl IntoView {
+    let drawer_toggle: NodeRef<html::Input> = NodeRef::new();
+    let close_drawer = move |_| {
+        if let Some(input) = drawer_toggle.get() {
+            input.set_checked(false);
+        }
+    };
+
     view! {
         <div class="drawer lg:drawer-open">
-            <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+            <input id="my-drawer" type="checkbox" class="drawer-toggle" node_ref=drawer_toggle />
             <div class="drawer-content">
                 // <navbar class="shadow-sm navbar bg-base-100">
                 // <label for="my-drawer" class="lg:hidden btn btn-primary drawer-button">
@@ -144,6 +152,7 @@ pub fn Navbar() -> impl IntoView {
                                 // our root route: the contact list is always shown
                                 <Route path=path!("") view=ContactList />
                                 <Route path=path!("c/:id") view=Contact />
+                                <Route path=path!("about") view=About />
                                 <Route path=path!("settings") view=Settings />
                             // a fallback if the /:id segment is missing from the URL
                             </Routes>
@@ -154,8 +163,8 @@ pub fn Navbar() -> impl IntoView {
             </div>
             <div class="drawer-side">
                 <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-                <ul class="p-4 w-80 min-h-full menu bg-base-300 text-base-content">
-                    <li>
+                <div class="flex flex-col w-80 min-h-full bg-base-300 text-base-content">
+                    <div class="p-4 border-b border-base-200">
                         <label for="my-drawer" class="lg:hidden btn btn-primary drawer-button">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -173,19 +182,204 @@ pub fn Navbar() -> impl IntoView {
                             </svg>
 
                         </label>
-                    </li>
-                    <li>
-                        <A href="/c/1">Chat 1</A>
-                    </li>
-                    <li>
-                        <A href="/c/2">Chat 2</A>
-                    </li>
-                    <li>
-                        <A href="/settings">Settings</A>
-                    </li>
-                </ul>
+                    </div>
+                    <ul class="overflow-y-auto flex-1 p-4 menu">
+                        <li>
+                            <A href="/c/1" on:click=close_drawer>
+                                Chat 1
+                            </A>
+                        </li>
+                        <li>
+                            <A href="/c/2" on:click=close_drawer>
+                                Chat 2
+                            </A>
+                        </li>
+                        <li>
+                            <A href="/c/3" on:click=close_drawer>
+                                Chat 3
+                            </A>
+                        </li>
+                    </ul>
+                    <div class="p-4 border-t border-base-200 pb-[env(safe-area-inset-bottom)]">
+                        <ul class="p-0 menu">
+                            <li>
+                                <A href="/about" on:click=close_drawer>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        class="w-5 h-5"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M11.25 11.25v3.75m0-7.5h.008v.008H11.25z"
+                                        />
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 21a9 9 0 100-18 9 9 0 000 18z"
+                                        />
+                                    </svg>
+                                    About
+                                </A>
+                            </li>
+                            <li>
+                                <A href="/settings" on:click=close_drawer>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        class="w-5 h-5"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M11.25 3.75l.434 1.736a8.25 8.25 0 013.03 1.748l1.652-.662 1.5 2.598-1.218 1.218a8.25 8.25 0 010 3.495l1.218 1.218-1.5 2.598-1.652-.662a8.25 8.25 0 01-3.03 1.748l-.434 1.736h-3l-.434-1.736a8.25 8.25 0 01-3.03-1.748l-1.652.662-1.5-2.598 1.218-1.218a8.25 8.25 0 010-3.495L3.134 6.57l1.5-2.598 1.652.662a8.25 8.25 0 013.03-1.748L8.25 3.75h3z"
+                                        />
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z"
+                                        />
+                                    </svg>
+                                    Settings
+                                </A>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
+    }
+}
+
+#[component]
+fn ThemeToggle() -> impl IntoView {
+    let themes: Vec<&'static str> = vec!["default", "retro", "cyberpunk"];
+    let labels: Vec<&'static str> = vec!["Public", "Private", "Ultra Private"];
+
+    let (idx, set_idx) = signal(0usize);
+    let (flip, set_flip) = signal(false);
+
+    // Initialize from document attribute
+    if let Some(win) = window() {
+        if let Some(doc) = win.document() {
+            if let Some(el) = doc.document_element() {
+                if let Some(current) = el.get_attribute("data-theme") {
+                    if let Some(pos) = themes.iter().position(|t| *t == current) {
+                        set_idx.set(pos);
+                    }
+                }
+            }
+        }
+    }
+
+    // Apply theme whenever idx changes
+    let themes_for_effect = themes.clone();
+    Effect::new(move |_| {
+        let theme = themes_for_effect[idx.get()];
+        if let Some(win) = window() {
+            if let Some(doc) = win.document() {
+                if let Some(el) = doc.document_element() {
+                    let _ = el.set_attribute("data-theme", theme);
+                }
+            }
+        }
+    });
+
+    let on_click = move |_| {
+        set_idx.update(|i| *i = (*i + 1) % 3);
+        set_flip.update(|f| *f = !*f);
+    };
+
+    let aria = Signal::derive(move || labels[idx.get()].to_string());
+    let flip_transform = Signal::derive(move || {
+        if idx.get() % 2 == 0 {
+            "rotateY(0deg)".to_string()
+        } else {
+            "rotateY(180deg)".to_string()
+        }
+    });
+
+    view! {
+        <button
+            type="button"
+            class="inline-flex justify-center items-center p-0 m-0 bg-transparent border-0 cursor-pointer hover:opacity-80 focus:outline-none text-base-content"
+            aria-label=aria
+            on:click=on_click
+        >
+            <div class="w-7 h-7 transition-transform duration-300 sm:w-6 sm:h-6" style:transform=flip_transform>
+                {move || match idx.get() {
+                    0 => {
+                        view! {
+                            // Public icon
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                class="w-7 h-7 sm:w-6 sm:h-6"
+                                fill="none"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-4.418 0-8 2.015-8 4.5v1.5h16v-1.5c0-2.485-3.582-4.5-8-4.5z"
+                                />
+                            </svg>
+                        }
+                            .into_view()
+                    }
+                    1 => {
+                        view! {
+                            // Private icon (lock)
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                class="w-7 h-7 sm:w-6 sm:h-6"
+                                fill="none"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M16 11V7a4 4 0 10-8 0v4m-2 0h12v8H6v-8z"
+                                />
+                            </svg>
+                        }
+                            .into_view()
+                    }
+                    _ => {
+                        view! {
+                            // Ultra Private icon (shield)
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                class="w-7 h-7 sm:w-6 sm:h-6"
+                                fill="none"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 3l7 4v5c0 5-3.5 9-7 9s-7-4-7-9V7l7-4zm0 6l3 3-3 3-3-3 3-3z"
+                                />
+                            </svg>
+                        }
+                            .into_view()
+                    }
+                }}
+            </div>
+        </button>
     }
 }
 
@@ -272,31 +466,7 @@ fn ContactList() -> impl IntoView {
                             />
                         </svg>
                     </button>
-                    // <input
-                    <div class="join join-horizontal">
-                        <input
-                            type="radio"
-                            name="theme-buttons"
-                            class="btn theme-controller join-item"
-                            aria-label="Public"
-                            value="default"
-                            checked
-                        />
-                        <input
-                            type="radio"
-                            name="theme-buttons"
-                            class="btn theme-controller join-item"
-                            aria-label="Private"
-                            value="retro"
-                        />
-                        <input
-                            type="radio"
-                            name="theme-buttons"
-                            class="btn theme-controller join-item"
-                            aria-label="Ultra Private"
-                            value="cyberpunk"
-                        />
-                    </div>
+                    <ThemeToggle />
                 </div>
             </div>
 
@@ -367,4 +537,9 @@ fn Contact() -> impl IntoView {
 #[component]
 fn Settings() -> impl IntoView {
     view! { <div>"Here are the settings"</div> }
+}
+
+#[component]
+fn About() -> impl IntoView {
+    view! { <div>"About this app"</div> }
 }
